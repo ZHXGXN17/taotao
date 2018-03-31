@@ -30,7 +30,7 @@ import com.taotao.service.ItemService;
  * @author: wangyf
  * @date:   2018-3-28 20:26:50
  */
-@Service("itemService")
+@Service
 public class ItemServiceImpl implements ItemService{
 	
 	@Autowired
