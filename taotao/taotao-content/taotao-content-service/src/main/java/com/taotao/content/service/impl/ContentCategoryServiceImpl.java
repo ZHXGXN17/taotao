@@ -17,12 +17,14 @@
 package com.taotao.content.service.impl;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.taotao.common.pojo.EasyUITreeNode;
+import com.taotao.common.pojo.TaotaoResult;
 import com.taotao.content.service.ContentCategoryService;
 import com.taotao.mapper.TbContentCategoryMapper;
 import com.taotao.pojo.TbContentCategory;
@@ -64,4 +66,87 @@ public class ContentCategoryServiceImpl implements ContentCategoryService {
 		return resultList;
 	}
 
+	/* (non-Javadoc)
+	 * @see com.taotao.content.service.ContentCategoryService#addContentCategory(long, java.lang.String)
+	 */
+	@Override
+	public TaotaoResult addContentCategory(long parentId, String name) {
+		// 创建pojo对象
+		TbContentCategory content = new TbContentCategory();
+		// 补全对象的属性
+		content.setParentId(parentId);
+		content.setName(name);
+		// 状态。可选值:1(正常),2(删除)
+		content.setStatus(1);
+		// 排序，默认为1
+		content.setSortOrder(1);
+		content.setIsParent(false);
+		content.setCreated(new Date());
+		content.setUpdated(new Date());
+		// 插入到数据库
+		tbContentCategoryMapper.insert(content);
+		// 判断父节点的状态
+		TbContentCategory parent = tbContentCategoryMapper.selectByPrimaryKey(parentId);
+		if(!parent.getIsParent()) {
+			// 如果父节点为子节点，则修改为父节点
+			parent.setIsParent(true);
+			// 更新数据
+		    tbContentCategoryMapper.updateByPrimaryKey(parent);
+		}
+		// 返回结果
+		return TaotaoResult.ok(content);
+	}
+
+	/* (non-Javadoc)
+	 * @see com.taotao.content.service.ContentCategoryService#updateContentCategory(long, java.lang.String)
+	 */
+	@Override
+	public TaotaoResult updateContentCategory(long id, String name) {
+		// 根据id查询数据然后修改name
+		TbContentCategory content = tbContentCategoryMapper.selectByPrimaryKey(id);
+		content.setName(name);
+		content.setUpdated(new Date());
+		tbContentCategoryMapper.updateByPrimaryKey(content);
+		return TaotaoResult.ok();
+	}
+
+	/* (non-Javadoc)
+	 * @see com.taotao.content.service.ContentCategoryService#delete(long)
+	 */
+	@Override
+	public TaotaoResult delete(long id) {
+		// 根据id查询数据然后修改name
+		TbContentCategory content = tbContentCategoryMapper.selectByPrimaryKey(id);
+		// 先判断是否为父节点
+		if(content.getIsParent()) {
+			return TaotaoResult.ok(content);
+		}else {
+			tbContentCategoryMapper.deleteByPrimaryKey(id);
+			return TaotaoResult.ok();
+		}
+	}
+
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

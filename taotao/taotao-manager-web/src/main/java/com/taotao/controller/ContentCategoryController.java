@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.taotao.common.pojo.EasyUITreeNode;
+import com.taotao.common.pojo.TaotaoResult;
 import com.taotao.content.service.ContentCategoryService;
 
 /**
@@ -41,5 +42,23 @@ public class ContentCategoryController {
 	@ResponseBody
 	public List<EasyUITreeNode> getContentCategoryList(@RequestParam(value = "id", defaultValue = "0") long parentId){
 		return contentCategoryService.getContentCategoryList(parentId);
+	}
+	
+	@RequestMapping("/content/category/create")
+	@ResponseBody
+	public TaotaoResult addContentCategory(long parentId, String name) {
+		return contentCategoryService.addContentCategory(parentId, name);
+	}
+	
+	@RequestMapping("/content/category/update")
+	@ResponseBody
+	public TaotaoResult updateContentCategory(long id, String name) {
+		return contentCategoryService.updateContentCategory(id, name);
+	}
+	
+	@RequestMapping("/content/category/delete")
+	@ResponseBody
+	public TaotaoResult delete(long id) {
+		return contentCategoryService.delete(id);
 	}
 }

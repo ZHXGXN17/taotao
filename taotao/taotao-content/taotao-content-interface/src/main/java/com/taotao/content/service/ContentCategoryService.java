@@ -19,6 +19,7 @@ package com.taotao.content.service;
 import java.util.List;
 
 import com.taotao.common.pojo.EasyUITreeNode;
+import com.taotao.common.pojo.TaotaoResult;
 
 /**
  * @author robin
@@ -27,5 +28,11 @@ import com.taotao.common.pojo.EasyUITreeNode;
 public interface ContentCategoryService {
 	
 	List<EasyUITreeNode> getContentCategoryList(long parentId);
+	
+	TaotaoResult addContentCategory(long parentId, String name);
+	
+	TaotaoResult updateContentCategory(long id, String name);
+	
+	TaotaoResult delete(long id);
 
 }
