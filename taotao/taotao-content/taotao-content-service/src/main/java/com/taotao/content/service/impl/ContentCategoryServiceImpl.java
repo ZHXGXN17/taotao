@@ -119,11 +119,21 @@ public class ContentCategoryServiceImpl implements ContentCategoryService {
 		TbContentCategory content = tbContentCategoryMapper.selectByPrimaryKey(id);
 		// 先判断是否为父节点
 		if(content.getIsParent()) {
-			return TaotaoResult.ok(content);
-		}else {
-			tbContentCategoryMapper.deleteByPrimaryKey(id);
-			return TaotaoResult.ok();
+			TbContentCategoryExample example = new TbContentCategoryExample();
+			Criteria cri = example.createCriteria();
+			cri.andParentIdEqualTo(id);
+			List<TbContentCategory> list = tbContentCategoryMapper.selectByExample(example);
+			if(list != null || !list.isEmpty()) {
+				for(int i = 0; i < list.size(); i++) {
+					delete(list.get(i).getId());
+				}
+			}else {
+				tbContentCategoryMapper.deleteByPrimaryKey(id);
+			}
+			
 		}
+		tbContentCategoryMapper.deleteByPrimaryKey(id);
+		return TaotaoResult.ok();
 	}
 
 }

@@ -68,9 +68,7 @@ function menuHandler(item){
 			if(r){
 				$.post("/content/category/delete/",{id:node.id},function(data){
 					// tree.tree("remove",node.target);
-					if(data.data != null){
-						$.messager.alert('删除', '该节点为父节点，不可以删除');
-					}else if(data.data == null){
+					if(data.status == 200){
 						$.messager.alert('删除', '删除成功');
 					}
 				});	
