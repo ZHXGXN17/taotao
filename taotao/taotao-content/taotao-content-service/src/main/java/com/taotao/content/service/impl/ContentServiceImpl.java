@@ -23,6 +23,9 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
+import com.taotao.common.pojo.EasyUIDataGridResult;
 import com.taotao.common.pojo.EasyUITreeNode;
 import com.taotao.common.pojo.TaotaoResult;
 import com.taotao.content.service.ContentService;
@@ -58,21 +61,38 @@ public class ContentServiceImpl implements ContentService{
 	 * @see com.taotao.content.service.ContentService#queryList(long)
 	 */
 	@Override
-	public List<EasyUITreeNode> queryList(long categoryId) {
+	public EasyUIDataGridResult queryList(long categoryId, int page, int rows) {
+		PageHelper.startPage(page, rows);
 		TbContentExample example = new TbContentExample();
 		Criteria cri = example.createCriteria();
 		cri.andCategoryIdEqualTo(categoryId);
 		
 		List<TbContent> list = tbContentMapper.selectByExample(example);
-		List<EasyUITreeNode> resultList = new ArrayList<EasyUITreeNode>();
-		for(TbContent content : list) {
-			EasyUITreeNode node = new EasyUITreeNode();
-			node.setId(content.getId());
-			node.setText(content.getTitle());
-			node.setState(content.getSubTitle());
-			resultList.add(node);
-		}
-		return resultList;
+		// 取查询结果
+		PageInfo<TbContent> pageInfo = new PageInfo<TbContent>(list);
+		EasyUIDataGridResult result = new EasyUIDataGridResult();
+		result.setRows(list);
+		result.setTotal(pageInfo.getTotal());
+		
+		return result;
+	}
+
+	/* (non-Javadoc)
+	 * @see com.taotao.content.service.ContentService#delete(long)
+	 */
+	@Override
+	public TaotaoResult delete(long id) {
+		tbContentMapper.deleteByPrimaryKey(id);
+		return TaotaoResult.ok();
+	}
+
+	/* (non-Javadoc)
+	 * @see com.taotao.content.service.ContentService#update(com.taotao.pojo.TbContent)
+	 */
+	@Override
+	public TaotaoResult update(TbContent content) {
+		tbContentMapper.updateByPrimaryKey(content);
+		return TaotaoResult.ok();
 	}
 
 }

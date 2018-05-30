@@ -16,15 +16,13 @@
  */
 package com.taotao.controller;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.taotao.common.pojo.EasyUITreeNode;
+import com.taotao.common.pojo.EasyUIDataGridResult;
 import com.taotao.common.pojo.TaotaoResult;
 import com.taotao.content.service.ContentService;
 import com.taotao.pojo.TbContent;
@@ -41,8 +39,8 @@ public class ContentController {
 	
 	@RequestMapping("/content/query/list")
 	@ResponseBody
-	public List<EasyUITreeNode> queryList(@RequestParam(value = "categoryId", defaultValue = "0") long categoryId){
-		return contentService.queryList(categoryId);
+	public EasyUIDataGridResult queryList(@RequestParam(value = "categoryId", defaultValue = "0") long categoryId, int page, int rows){
+		return contentService.queryList(categoryId, page, rows);
 	}
 	
 	@RequestMapping("/content/save")
@@ -50,5 +48,36 @@ public class ContentController {
 	public TaotaoResult add(TbContent content) {
 		return contentService.add(content);
 	}
+	
+	
+	@RequestMapping("/content/delete")
+	@ResponseBody
+	public TaotaoResult delete(long ids) {
+		return contentService.delete(ids);
+	}
+	
+	@RequestMapping("/content/edit")
+	@ResponseBody
+	public TaotaoResult update(TbContent content) {
+		return contentService.update(content);
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 
 }

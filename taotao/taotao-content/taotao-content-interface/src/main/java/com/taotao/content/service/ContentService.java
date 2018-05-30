@@ -16,9 +16,7 @@
  */
 package com.taotao.content.service;
 
-import java.util.List;
-
-import com.taotao.common.pojo.EasyUITreeNode;
+import com.taotao.common.pojo.EasyUIDataGridResult;
 import com.taotao.common.pojo.TaotaoResult;
 import com.taotao.pojo.TbContent;
 
@@ -28,8 +26,12 @@ import com.taotao.pojo.TbContent;
  */
 public interface ContentService {
 	
-	List<EasyUITreeNode> queryList(long categoryId);
+	EasyUIDataGridResult queryList(long categoryId, int page, int rows);
 	
 	TaotaoResult add(TbContent content);
+	
+	TaotaoResult delete(long id);
+	
+	TaotaoResult update(TbContent content);
 
 }
