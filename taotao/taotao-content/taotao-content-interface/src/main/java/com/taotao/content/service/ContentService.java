@@ -16,6 +16,8 @@
  */
 package com.taotao.content.service;
 
+import java.util.List;
+
 import com.taotao.common.pojo.EasyUIDataGridResult;
 import com.taotao.common.pojo.TaotaoResult;
 import com.taotao.pojo.TbContent;
@@ -33,5 +35,7 @@ public interface ContentService {
 	TaotaoResult delete(long id);
 	
 	TaotaoResult update(TbContent content);
+	
+	List<TbContent> getContentByCid(long categoryId);
 
 }

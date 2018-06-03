@@ -264,11 +264,11 @@
 
   <repositories>
         <!-- 阿里云镜像 -->
-        <!-- <repository>
+        <repository>
             <id>nexus</id>
             <name>Team Nexus Repository</name>
             <url>http://maven.aliyun.com/nexus/content/groups/public</url>
-        </repository> -->
+        </repository>
         
         <!-- mvn国外镜像 -->
         <repository>

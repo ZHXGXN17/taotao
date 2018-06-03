@@ -16,19 +16,20 @@
  */
 package com.taotao.content.service.impl;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.taotao.common.pojo.EasyUIDataGridResult;
-import com.taotao.common.pojo.EasyUITreeNode;
 import com.taotao.common.pojo.TaotaoResult;
+import com.taotao.common.utils.JsonUtils;
 import com.taotao.content.service.ContentService;
+import com.taotao.jedis.JedisClient;
 import com.taotao.mapper.TbContentMapper;
 import com.taotao.pojo.TbContent;
 import com.taotao.pojo.TbContentExample;
@@ -43,6 +44,9 @@ public class ContentServiceImpl implements ContentService{
 	
 	@Autowired
 	private TbContentMapper tbContentMapper;
+	
+	@Autowired
+	private JedisClient jedisClient;
 
 	/* (non-Javadoc)
 	 * @see com.taotao.content.service.ContentService#add(com.taotao.pojo.TbContent)
@@ -54,6 +58,8 @@ public class ContentServiceImpl implements ContentService{
 		content.setUpdated(new Date());
 		// 插入到内容表
 		tbContentMapper.insert(content);
+		// 删除缓存
+		jedisClient.hdel("INDEX_CONTENT", content.getCategoryId().toString());
 		return TaotaoResult.ok();
 	}
 
@@ -83,6 +89,7 @@ public class ContentServiceImpl implements ContentService{
 	@Override
 	public TaotaoResult delete(long id) {
 		tbContentMapper.deleteByPrimaryKey(id);
+		jedisClient.hdel("INDEX_CONTENT", id + "");
 		return TaotaoResult.ok();
 	}
 
@@ -92,7 +99,39 @@ public class ContentServiceImpl implements ContentService{
 	@Override
 	public TaotaoResult update(TbContent content) {
 		tbContentMapper.updateByPrimaryKey(content);
+		jedisClient.hdel("INDEX_CONTENT", content.getCategoryId().toString());
 		return TaotaoResult.ok();
+	}
+
+	/* (non-Javadoc)
+	 * @see com.taotao.content.service.ContentService#getContentByCid(long)
+	 */
+	@Override
+	public List<TbContent> getContentByCid(long categoryId) {
+		// 先查询缓存
+		// 添加缓存不能影响正常业务逻辑
+		try {
+			// 查询缓存
+			String json = jedisClient.hget("INDEX_CONTENT", categoryId + "");
+			// 查询到结果，把json转化为list返回
+			if(StringUtils.isNotBlank(json)) {
+				List<TbContent> list =JsonUtils.jsonToList(json, TbContent.class);
+				return list;
+			}
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+		TbContentExample example = new TbContentExample();
+	    Criteria cri = example.createCriteria();
+	    cri.andCategoryIdEqualTo(categoryId);
+	    List<TbContent> list = tbContentMapper.selectByExample(example);
+	    // 把结果添加到缓存
+	    try {
+	    	jedisClient.hset("INDEX_CONTENT", categoryId + "", JsonUtils.objectToJson(list));
+	    }catch(Exception e) {
+	    	e.printStackTrace();
+	    }
+		return list;
 	}
 
 }
